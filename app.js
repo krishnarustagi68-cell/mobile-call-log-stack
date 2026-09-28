@@ -1,11 +1,12 @@
 /**
  * Mobile Call Log Management System
- * Data Structure: Array-Based Stack (LIFO)
+ * Final-Year Professional Engineering Implementation
+ * Data Structure: Array-Based Stack (LIFO: Last-In-First-Out)
  * DIT University - CSN102 Data Structure Project 8
  * Authors: Krishna Rustagi, Samaksh Raj, Rimesh Raj, Aditya Raj
  */
 
-// Sound Engine using Web Audio API
+// DTMF & Telephony Sound Engine (Web Audio API)
 class AudioEngine {
   constructor() {
     this.ctx = null;
@@ -39,8 +40,8 @@ class AudioEngine {
     osc1.frequency.value = freqs[0];
     osc2.frequency.value = freqs[1];
 
-    gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.16);
+    gain.gain.setValueAtTime(0.07, this.ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.15);
 
     osc1.connect(gain);
     osc2.connect(gain);
@@ -48,8 +49,8 @@ class AudioEngine {
 
     osc1.start();
     osc2.start();
-    osc1.stop(this.ctx.currentTime + 0.16);
-    osc2.stop(this.ctx.currentTime + 0.16);
+    osc1.stop(this.ctx.currentTime + 0.15);
+    osc2.stop(this.ctx.currentTime + 0.15);
   }
 
   playPush() {
@@ -58,14 +59,14 @@ class AudioEngine {
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(320, this.ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(740, this.ctx.currentTime + 0.18);
+    osc.frequency.setValueAtTime(300, this.ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(750, this.ctx.currentTime + 0.16);
     gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.18);
+    gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.16);
     osc.connect(gain);
     gain.connect(this.ctx.destination);
     osc.start();
-    osc.stop(this.ctx.currentTime + 0.18);
+    osc.stop(this.ctx.currentTime + 0.16);
   }
 
   playPop() {
@@ -74,14 +75,14 @@ class AudioEngine {
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
     osc.type = 'triangle';
-    osc.frequency.setValueAtTime(650, this.ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(220, this.ctx.currentTime + 0.22);
-    gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.22);
+    osc.frequency.setValueAtTime(620, this.ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(200, this.ctx.currentTime + 0.2);
+    gain.gain.setValueAtTime(0.14, this.ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
     osc.connect(gain);
     gain.connect(this.ctx.destination);
     osc.start();
-    osc.stop(this.ctx.currentTime + 0.22);
+    osc.stop(this.ctx.currentTime + 0.2);
   }
 
   playPeek() {
@@ -91,17 +92,17 @@ class AudioEngine {
     const gain = this.ctx.createGain();
     osc.type = 'sine';
     osc.frequency.setValueAtTime(880, this.ctx.currentTime);
-    osc.frequency.linearRampToValueAtTime(1174, this.ctx.currentTime + 0.15);
+    osc.frequency.linearRampToValueAtTime(1175, this.ctx.currentTime + 0.15);
     gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.3);
+    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.25);
     osc.connect(gain);
     gain.connect(this.ctx.destination);
     osc.start();
-    osc.stop(this.ctx.currentTime + 0.3);
+    osc.stop(this.ctx.currentTime + 0.25);
   }
 }
 
-// Stack Data Structure Implementation (Mirroring C Code)
+// Array-Based Stack Implementation (C-Structure Equivalence)
 class CallStack {
   constructor(maxSize = 50) {
     this.MAX = maxSize;
@@ -126,26 +127,25 @@ class CallStack {
 
   pushCall(callRecord) {
     if (this.isFull()) {
-      return { success: false, message: 'Call log is FULL! Cannot add more calls.' };
+      return { success: false, message: 'Call log is FULL! (Stack Overflow, capacity = 50).' };
     }
     this.top++;
-    // Format timestamp if not present
     if (!callRecord.timestamp) {
       callRecord.timestamp = this.formatDate(new Date());
     }
     this.calls[this.top] = { ...callRecord };
     this.saveState();
-    return { success: true, message: 'Call record added successfully.', record: this.calls[this.top] };
+    return { success: true, message: 'Call record pushed to top of stack.', record: this.calls[this.top] };
   }
 
   popCall() {
     if (this.isEmpty()) {
-      return { success: false, message: 'Call log is empty. Nothing to delete.' };
+      return { success: false, message: 'Call log is empty. (Stack Underflow, nothing to delete).' };
     }
     const deleted = this.calls[this.top];
     this.top--;
     this.saveState();
-    return { success: true, message: 'Deleted recent call', record: deleted };
+    return { success: true, message: 'Deleted recent call (pop)', record: deleted };
   }
 
   peekCall() {
@@ -157,7 +157,7 @@ class CallStack {
 
   viewCallLog() {
     if (this.isEmpty()) return [];
-    // Traverse from top down to 0 (LIFO order)
+    // Traverse from top down to 0 (LIFO order: most recent call first)
     const log = [];
     for (let i = this.top; i >= 0; i--) {
       log.push({ ...this.calls[i], stackIndex: i });
@@ -178,7 +178,7 @@ class CallStack {
         top: this.top,
         calls: this.calls.slice(0, this.top + 1)
       };
-      localStorage.setItem('dit_call_log_stack', JSON.stringify(data));
+      localStorage.setItem('dit_call_log_stack_pro', JSON.stringify(data));
     } catch (e) {
       console.warn('Storage error:', e);
     }
@@ -186,10 +186,10 @@ class CallStack {
 
   loadState() {
     try {
-      const raw = localStorage.getItem('dit_call_log_stack');
+      const raw = localStorage.getItem('dit_call_log_stack_pro');
       if (raw) {
         const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed.calls)) {
+        if (Array.isArray(parsed.calls) && parsed.calls.length > 0) {
           this.calls = parsed.calls;
           this.top = parsed.top !== undefined ? parsed.top : parsed.calls.length - 1;
           return;
@@ -198,44 +198,77 @@ class CallStack {
     } catch (e) {
       console.warn('Could not load stack state:', e);
     }
-    // Default initial seed matching the project assignment
-    this.loadSampleData();
+    // Load large rich dataset by default so Mam has plenty of data to inspect!
+    this.loadExtensiveDataset();
   }
 
-  loadSampleData() {
+  loadSampleRunData() {
     this.initStack();
     // 3 calls as executed in Sample Run 1 of PDF Page 12:
-    this.pushCall({
-      number: '9876543210',
-      type: 'Outgoing',
-      duration: 120,
-      timestamp: '01-09-2026'
-    });
-    this.pushCall({
-      number: '9123456780',
-      type: 'Incoming',
-      duration: 45,
-      timestamp: '01-09-2026'
-    });
-    this.pushCall({
-      number: '9988776655',
-      type: 'Missed',
-      duration: 0,
-      timestamp: '01-09-2026'
-    });
+    this.pushCall({ number: '9876543210', type: 'Outgoing', duration: 120, timestamp: '01-09-2026' });
+    this.pushCall({ number: '9123456780', type: 'Incoming', duration: 45,  timestamp: '01-09-2026' });
+    this.pushCall({ number: '9988776655', type: 'Missed',   duration: 0,   timestamp: '01-09-2026' });
+  }
+
+  loadExtensiveDataset() {
+    this.initStack();
+    const dataset = [
+      { number: '9876543210', type: 'Outgoing', duration: 120, timestamp: '01-09-2026' },
+      { number: '9123456780', type: 'Incoming', duration: 45,  timestamp: '01-09-2026' },
+      { number: '9988776655', type: 'Missed',   duration: 0,   timestamp: '01-09-2026' },
+      { number: '1000025730', type: 'Incoming', duration: 340, timestamp: '02-09-2026' },
+      { number: '1000026934', type: 'Outgoing', duration: 85,  timestamp: '02-09-2026' },
+      { number: '1000026924', type: 'Incoming', duration: 210, timestamp: '03-09-2026' },
+      { number: '9412055678', type: 'Missed',   duration: 0,   timestamp: '03-09-2026' },
+      { number: '9897123456', type: 'Outgoing', duration: 520, timestamp: '04-09-2026' },
+      { number: '9760123987', type: 'Incoming', duration: 15,  timestamp: '04-09-2026' },
+      { number: '9837001122', type: 'Outgoing', duration: 95,  timestamp: '05-09-2026' },
+      { number: '9456789012', type: 'Missed',   duration: 0,   timestamp: '05-09-2026' },
+      { number: '9897654321', type: 'Incoming', duration: 180, timestamp: '06-09-2026' },
+      { number: '9112233445', type: 'Outgoing', duration: 410, timestamp: '07-09-2026' },
+      { number: '9634567890', type: 'Incoming', duration: 60,  timestamp: '08-09-2026' },
+      { number: '9870987654', type: 'Missed',   duration: 0,   timestamp: '09-09-2026' },
+      { number: '9837123789', type: 'Outgoing', duration: 135, timestamp: '10-09-2026' },
+      { number: '9123456780', type: 'Incoming', duration: 90,  timestamp: '11-09-2026' },
+      { number: '9876543210', type: 'Outgoing', duration: 240, timestamp: '12-09-2026' },
+      { number: '9988776655', type: 'Incoming', duration: 310, timestamp: '13-09-2026' },
+      { number: '1000024715', type: 'Outgoing', duration: 65,  timestamp: '14-09-2026' }
+    ];
+    dataset.forEach(c => this.pushCall(c));
   }
 }
 
-// App Controller & UI Bindings
+// Main Application Controller
 class AppController {
   constructor() {
     this.sound = new AudioEngine();
     this.stack = new CallStack(50);
     this.currentDialNumber = '';
     this.activeFilter = 'all';
+    this.searchQuery = '';
     this.callTimerInterval = null;
     this.callSeconds = 0;
     this.currentActiveCaller = null;
+
+    this.contactsBook = {
+      '9876543210': 'Samaksh Raj',
+      '9123456780': 'DIT HOD / Academic Dept',
+      '9988776655': 'Krishna Rustagi (Lead)',
+      '1000024715': 'Krishna Rustagi',
+      '1000025730': 'Samaksh Raj',
+      '1000026934': 'Rimesh Raj',
+      '1000026924': 'Aditya Raj',
+      '9412055678': 'Prof. Data Structures',
+      '9897123456': 'Dr. CSN102 Faculty Evaluator',
+      '9760123987': 'Mom',
+      '9837001122': 'Amazon Courier Delivery',
+      '9456789012': 'DIT Placement Cell',
+      '9897654321': 'Project Lab Assistant',
+      '9112233445': 'Emergency Services (112)',
+      '9634567890': 'Library Information Desk',
+      '9870987654': 'Hostel Warden Office',
+      '9837123789': 'Class Representative (BTRAI)'
+    };
 
     this.initElements();
     this.bindEvents();
@@ -245,7 +278,6 @@ class AppController {
   }
 
   initElements() {
-    // Phone UI
     this.phoneTimeEl = document.getElementById('phoneTime');
     this.recentsListEl = document.getElementById('recentsList');
     this.dialDisplayEl = document.getElementById('dialNumberDisplay');
@@ -255,8 +287,9 @@ class AppController {
     this.activeCallTimer = document.getElementById('activeCallTimer');
     this.incomingCallModal = document.getElementById('incomingCallModal');
     this.incomingCallerName = document.getElementById('incomingCallerName');
+    this.tracerStepEl = document.getElementById('tracerStepText');
 
-    // Visualizer UI
+    // Visualizer Elements
     this.stackItemsStack = document.getElementById('stackItemsStack');
     this.hudTopPointer = document.getElementById('hudTopPointer');
     this.hudStackState = document.getElementById('hudStackState');
@@ -271,26 +304,62 @@ class AppController {
 
     // Modals
     this.addCallModal = document.getElementById('addCallModal');
+    this.vivaModal = document.getElementById('vivaModal');
     this.vercelModal = document.getElementById('vercelModal');
     this.shareModal = document.getElementById('shareModal');
     this.toastContainer = document.getElementById('toastContainer');
   }
 
   bindEvents() {
-    // Audio toggle
-    const audioBtn = document.getElementById('btnToggleAudio');
-    if (audioBtn) {
-      audioBtn.addEventListener('click', () => {
-        this.sound.enabled = !this.sound.enabled;
-        audioBtn.classList.toggle('btn-success', this.sound.enabled);
-        audioBtn.innerHTML = this.sound.enabled 
-          ? `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg> Sound: ON`
-          : `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="1" y1="1" x2="23" y2="23"></line><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon></svg> Sound: OFF`;
-        this.showToast(`Sound feedback ${this.sound.enabled ? 'Enabled' : 'Muted'}`, 'info');
-      });
-    }
+    // Sound Toggle
+    document.getElementById('btnToggleAudio')?.addEventListener('click', (e) => {
+      this.sound.enabled = !this.sound.enabled;
+      const btn = e.currentTarget;
+      btn.classList.toggle('btn-success', this.sound.enabled);
+      btn.innerHTML = this.sound.enabled 
+        ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg> <span>Sound: ON</span>`
+        : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="1" y1="1" x2="23" y2="23"></line><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon></svg> <span>Sound: OFF</span>`;
+      this.showToast(`Sound feedback ${this.sound.enabled ? 'Enabled' : 'Muted'}`, 'info');
+    });
 
-    // Phone Top Tabs (Recents vs Keypad)
+    // Main View Pills (Phone Simulator vs Stack Engine vs Analytics vs Viva)
+    document.querySelectorAll('.view-pill-btn, .dock-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetView = btn.dataset.view;
+        this.switchMainView(targetView);
+      });
+    });
+
+    // Faculty Viva Mode Button
+    document.getElementById('btnOpenViva')?.addEventListener('click', () => {
+      this.openModal(this.vivaModal);
+    });
+
+    // Extensive Dataset Load Button
+    document.getElementById('btnLoadExtensive')?.addEventListener('click', () => {
+      this.stack.loadExtensiveDataset();
+      this.renderAll();
+      this.setTracerStep('Loaded 20 Real-World Call Records (Simulated semester history)');
+      this.showToast('Loaded 20 realistic calls with varied durations & contacts!', 'success');
+      this.logToTerminal('Loaded extensive dataset (20 calls). Stack top = ' + this.stack.top);
+    });
+
+    // Assignment 3-Call Sample Run Button
+    document.getElementById('btnOpSample')?.addEventListener('click', () => {
+      this.stack.loadSampleRunData();
+      this.renderAll();
+      this.setTracerStep('Loaded exact 3 calls from assignment report (Page 12)');
+      this.showToast('Loaded Page 12 PDF Sample Run (3 calls)!', 'success');
+      this.logToTerminal('Loaded Page 12 PDF Sample Run (3 calls).');
+    });
+
+    // Phone Recents Search Filter
+    document.getElementById('phoneSearchInput')?.addEventListener('input', (e) => {
+      this.searchQuery = e.target.value.toLowerCase().trim();
+      this.renderRecents();
+    });
+
+    // Phone Tabs (Recents vs Keypad)
     document.querySelectorAll('.phone-tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.phone-tab-btn').forEach(b => b.classList.remove('active'));
@@ -311,7 +380,7 @@ class AppController {
       });
     });
 
-    // Keypad digit clicks
+    // Phone Keypad digits
     document.querySelectorAll('.key-btn').forEach(k => {
       k.addEventListener('click', () => {
         const val = k.dataset.key;
@@ -324,55 +393,36 @@ class AppController {
     });
 
     // Keypad backspace
-    const backspaceBtn = document.getElementById('btnBackspace');
-    if (backspaceBtn) {
-      backspaceBtn.addEventListener('click', () => {
-        this.currentDialNumber = this.currentDialNumber.slice(0, -1);
-        this.updateDialDisplay();
-      });
-    }
+    document.getElementById('btnBackspace')?.addEventListener('click', () => {
+      this.currentDialNumber = this.currentDialNumber.slice(0, -1);
+      this.updateDialDisplay();
+    });
 
-    // Initiate Call from Keypad
-    const callTriggerBtn = document.getElementById('btnCallTrigger');
-    if (callTriggerBtn) {
-      callTriggerBtn.addEventListener('click', () => {
-        const num = this.currentDialNumber.trim() || '9876543210';
-        this.startOutgoingCall(num);
-      });
-    }
+    // Place Call
+    document.getElementById('btnCallTrigger')?.addEventListener('click', () => {
+      const num = this.currentDialNumber.trim() || '9876543210';
+      this.startOutgoingCall(num);
+    });
 
-    // End Active Call
-    const endCallBtn = document.getElementById('btnEndCall');
-    if (endCallBtn) {
-      endCallBtn.addEventListener('click', () => {
-        this.endActiveCall();
-      });
-    }
+    // End Call
+    document.getElementById('btnEndCall')?.addEventListener('click', () => {
+      this.endActiveCall();
+    });
 
-    // Simulate Incoming Call Trigger
-    const simIncomingBtn = document.getElementById('btnSimulateIncoming');
-    if (simIncomingBtn) {
-      simIncomingBtn.addEventListener('click', () => {
-        this.triggerIncomingCall();
-      });
-    }
+    // Incoming Call Simulator
+    document.getElementById('btnSimulateIncoming')?.addEventListener('click', () => {
+      this.triggerIncomingCall();
+    });
 
-    // Accept / Decline Incoming Call
-    const btnAcceptIncoming = document.getElementById('btnAcceptIncoming');
-    if (btnAcceptIncoming) {
-      btnAcceptIncoming.addEventListener('click', () => {
-        this.acceptIncomingCall();
-      });
-    }
+    document.getElementById('btnAcceptIncoming')?.addEventListener('click', () => {
+      this.acceptIncomingCall();
+    });
 
-    const btnDeclineIncoming = document.getElementById('btnDeclineIncoming');
-    if (btnDeclineIncoming) {
-      btnDeclineIncoming.addEventListener('click', () => {
-        this.declineIncomingCall();
-      });
-    }
+    document.getElementById('btnDeclineIncoming')?.addEventListener('click', () => {
+      this.declineIncomingCall();
+    });
 
-    // Stack Operations: PUSH, POP, PEEK, TRAVERSE, RESET
+    // Stack Operations Hub
     document.getElementById('btnOpPush')?.addEventListener('click', () => {
       this.openAddCallModal();
     });
@@ -390,22 +440,16 @@ class AppController {
     });
 
     document.getElementById('btnOpReset')?.addEventListener('click', () => {
-      if (confirm('Reset call log stack to empty (s->top = -1)?')) {
+      if (confirm('Clear Stack? This executes initStack(&s) -> s.top = -1.')) {
         this.stack.initStack();
         this.renderAll();
+        this.setTracerStep('initStack(&s): Reset s->top = -1 (Stack is now empty)');
         this.showToast('Stack cleared: top = -1', 'info');
-        this.logToTerminal('Stack initialized. All records wiped.');
+        this.logToTerminal('Stack initialized. All calls wiped.');
       }
     });
 
-    document.getElementById('btnOpSample')?.addEventListener('click', () => {
-      this.stack.loadSampleData();
-      this.renderAll();
-      this.showToast('Loaded 3 sample calls from PDF assignment!', 'success');
-      this.logToTerminal('Loaded Assignment Sample Run (3 calls).');
-    });
-
-    // Add Call Modal Submission
+    // Add Call Form Submit
     document.getElementById('addCallForm')?.addEventListener('submit', (e) => {
       e.preventDefault();
       const num = document.getElementById('inputNumber').value.trim();
@@ -414,12 +458,13 @@ class AppController {
       let timestamp = document.getElementById('inputTimestamp').value.trim();
       if (!timestamp) timestamp = this.stack.formatDate(new Date());
 
+      this.setTracerStep(`pushCall(&s, c): s->top++; s->calls[${this.stack.top + 1}] = {"${num}", "${type}", ${duration}s};`);
       const res = this.stack.pushCall({ number: num, type, duration, timestamp });
       if (res.success) {
         this.sound.playPush();
         this.closeModal(this.addCallModal);
         this.renderAll();
-        this.showToast(`Pushed call: ${num} (${type})`, 'success');
+        this.showToast(`Pushed call: ${num} (${type}) to top`, 'success');
         this.logToTerminal(`PUSH -> Number: ${num} | Type: ${type} | Duration: ${duration}s | Time: ${timestamp}`);
       } else {
         this.showToast(res.message, 'danger');
@@ -434,17 +479,10 @@ class AppController {
       });
     });
 
-    // Vercel Modal
-    document.getElementById('btnVercelDeploy')?.addEventListener('click', () => {
-      this.openModal(this.vercelModal);
-    });
+    // Vercel & Share Modals
+    document.getElementById('btnVercelDeploy')?.addEventListener('click', () => this.openModal(this.vercelModal));
+    document.getElementById('btnShareProject')?.addEventListener('click', () => this.openModal(this.shareModal));
 
-    // Share Modal
-    document.getElementById('btnShareProject')?.addEventListener('click', () => {
-      this.openModal(this.shareModal);
-    });
-
-    // Copy Share Link
     document.getElementById('btnCopyShareLink')?.addEventListener('click', () => {
       const url = window.location.href;
       navigator.clipboard?.writeText(url).then(() => {
@@ -454,11 +492,11 @@ class AppController {
       });
     });
 
-    // Export CSV / JSON
+    // CSV & JSON Exports
     document.getElementById('btnExportCSV')?.addEventListener('click', () => this.exportCSV());
     document.getElementById('btnExportJSON')?.addEventListener('click', () => this.exportJSON());
 
-    // Navigation Tabs in Center Area
+    // C View Tabs in bottom card
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -471,7 +509,47 @@ class AppController {
     });
   }
 
-  // --- Real-time Clock in Phone Bezel ---
+  switchMainView(targetView) {
+    document.querySelectorAll('.view-pill-btn, .dock-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.view === targetView);
+    });
+
+    const phoneCol = document.getElementById('phoneSimulatorColumn');
+    const engineCol = document.getElementById('engineWorkspaceColumn');
+    const analyticsView = document.getElementById('viewAnalyticsStandalone');
+    const vivaView = document.getElementById('viewVivaStandalone');
+
+    // Reset visibility
+    if (analyticsView) analyticsView.classList.remove('active');
+    if (vivaView) vivaView.classList.remove('active');
+
+    if (targetView === 'phone') {
+      if (phoneCol) phoneCol.style.display = 'flex';
+      if (engineCol) engineCol.style.display = 'none';
+    } else if (targetView === 'stack') {
+      if (phoneCol) phoneCol.style.display = 'none';
+      if (engineCol) engineCol.style.display = 'flex';
+    } else if (targetView === 'split') {
+      if (phoneCol) phoneCol.style.display = 'flex';
+      if (engineCol) engineCol.style.display = 'flex';
+    } else if (targetView === 'analytics') {
+      if (phoneCol) phoneCol.style.display = 'none';
+      if (engineCol) engineCol.style.display = 'none';
+      if (analyticsView) analyticsView.classList.add('active');
+      this.renderAnalytics();
+    } else if (targetView === 'viva') {
+      if (phoneCol) phoneCol.style.display = 'none';
+      if (engineCol) engineCol.style.display = 'none';
+      if (vivaView) vivaView.classList.add('active');
+    }
+  }
+
+  setTracerStep(msg) {
+    if (this.tracerStepEl) {
+      this.tracerStepEl.textContent = msg;
+    }
+  }
+
   startLiveClock() {
     const updateTime = () => {
       const now = new Date();
@@ -483,7 +561,6 @@ class AppController {
     setInterval(updateTime, 1000);
   }
 
-  // --- Dial Display Update ---
   updateDialDisplay() {
     if (this.dialDisplayEl) {
       this.dialDisplayEl.textContent = this.currentDialNumber || ' ';
@@ -527,6 +604,7 @@ class AppController {
         duration: this.callSeconds,
         timestamp: this.stack.formatDate(new Date())
       };
+      this.setTracerStep(`Call finished (${this.callSeconds}s). pushCall(&s, c): s->top=${this.stack.top + 1}`);
       const res = this.stack.pushCall(callData);
       if (res.success) {
         this.sound.playPush();
@@ -539,20 +617,11 @@ class AppController {
   }
 
   triggerIncomingCall() {
-    const contacts = [
-      { name: 'Samaksh Raj', number: '1000025730' },
-      { name: 'Rimesh Raj', number: '1000026934' },
-      { name: 'Aditya Raj', number: '1000026924' },
-      { name: 'DIT University Dept', number: '9123456780' },
-      { name: 'Prof. Data Structures', number: '9988776655' }
-    ];
-    const chosen = contacts[Math.floor(Math.random() * contacts.length)];
-    this.currentActiveCaller = {
-      name: chosen.name,
-      number: chosen.number,
-      type: 'Incoming'
-    };
-    this.incomingCallerName.textContent = `${chosen.name} (${chosen.number})`;
+    const list = Object.keys(this.contactsBook);
+    const chosenNum = list[Math.floor(Math.random() * list.length)];
+    const chosenName = this.contactsBook[chosenNum];
+    this.currentActiveCaller = { name: chosenName, number: chosenNum, type: 'Incoming' };
+    this.incomingCallerName.textContent = `${chosenName} (${chosenNum})`;
     this.incomingCallModal.classList.add('open');
     this.sound.playDTMF('5');
   }
@@ -581,6 +650,7 @@ class AppController {
         duration: 0,
         timestamp: this.stack.formatDate(new Date())
       };
+      this.setTracerStep(`Missed Call: pushCall(&s, c) -> type="Missed", duration=0`);
       this.stack.pushCall(callData);
       this.renderAll();
       this.showToast(`Missed call from ${this.currentActiveCaller.name} pushed to stack!`, 'danger');
@@ -592,15 +662,18 @@ class AppController {
   // --- Stack Core Operations Handlers ---
   executePop() {
     if (this.stack.isEmpty()) {
+      this.setTracerStep('popCall(&s, &deleted): FAILED -> isEmpty(s) is TRUE (Underflow)');
       this.showToast('Call log is empty. Nothing to delete (Stack Underflow).', 'danger');
       this.logToTerminal('POP -> Error: Call log is empty. Underflow condition!');
       return;
     }
+    const targetIdx = this.stack.top;
+    this.setTracerStep(`popCall(&s, &deleted): *deleted = calls[${targetIdx}]; s->top-- (${targetIdx} -> ${targetIdx - 1});`);
+
     const topItemSlot = document.querySelector('.stack-slot.top-item');
-    if (topItemSlot) {
-      topItemSlot.classList.add('pop-animate');
-    }
+    if (topItemSlot) topItemSlot.classList.add('pop-animate');
     this.sound.playPop();
+
     setTimeout(() => {
       const res = this.stack.popCall();
       if (res.success) {
@@ -609,24 +682,25 @@ class AppController {
         this.showToast(`Deleted recent call: ${d.number} (${d.type})`, 'danger');
         this.logToTerminal(`POP -> Deleted recent call -> Number: ${d.number} | Type: ${d.type} | Duration: ${d.duration}s | Time: ${d.timestamp}`);
       }
-    }, 280);
+    }, 250);
   }
 
   executePeek() {
     const res = this.stack.peekCall();
     if (!res.success) {
+      this.setTracerStep('peekCall(&s, &top): FAILED -> isEmpty(s) is TRUE');
       this.showToast('Call log is empty.', 'danger');
       this.logToTerminal('PEEK -> Error: Call log is empty.');
       return;
     }
     this.sound.playPeek();
     const c = res.record;
+    this.setTracerStep(`peekCall(&s, &top): Inspecting calls[s->top = ${this.stack.top}] without modifying s->top`);
 
-    // Highlight top item in phone recents and in stack visualizer
     const topPhoneItem = document.querySelector('.call-item.is-top');
     if (topPhoneItem) {
       topPhoneItem.classList.remove('highlight-peek');
-      void topPhoneItem.offsetWidth; // trigger reflow
+      void topPhoneItem.offsetWidth;
       topPhoneItem.classList.add('highlight-peek');
     }
     const topVizItem = document.querySelector('.stack-slot.top-item');
@@ -636,16 +710,18 @@ class AppController {
       topVizItem.classList.add('highlight-peek');
     }
 
-    this.showToast(`Last Dialed / Recent Call: ${c.number} (${c.type}, ${c.duration}s)`, 'info');
+    this.showToast(`PEEK Top: ${c.number} (${c.type}, ${c.duration}s)`, 'info');
     this.logToTerminal(`PEEK -> Last dialed/received call -> Number: ${c.number} | Type: ${c.type} | Duration: ${c.duration}s | Time: ${c.timestamp}`);
   }
 
   executeTraverse() {
     if (this.stack.isEmpty()) {
+      this.setTracerStep('viewCallLog(&s): isEmpty(s) == TRUE -> Log empty');
       this.showToast('Call log is empty. No calls to display.', 'danger');
       this.logToTerminal('TRAVERSAL -> Call log is empty.');
       return;
     }
+    this.setTracerStep(`viewCallLog(&s): for (i = ${this.stack.top}; i >= 0; i--) printing records in O(n)`);
     this.showToast(`Traversing Call Stack: ${this.stack.top + 1} calls (LIFO order)`, 'info');
     this.logToTerminal(`\n--------------------------------------------------------------\n%-15s %-10s %-10s %-15s\nNumber          Type       Duration   Timestamp      \n--------------------------------------------------------------`);
     const logs = this.stack.viewCallLog();
@@ -654,7 +730,6 @@ class AppController {
     });
     this.logToTerminal(`--------------------------------------------------------------\nTotal calls in log: ${this.stack.top + 1}\n`);
 
-    // Switch to recents tab on phone to see
     const recentsTabBtn = document.querySelector('[data-tab="recents"]');
     if (recentsTabBtn) recentsTabBtn.click();
   }
@@ -664,11 +739,12 @@ class AppController {
     this.renderRecents();
     this.renderVisualizer();
     this.renderHUD();
+    this.renderAnalytics();
   }
 
   renderRecents() {
     if (!this.recentsListEl) return;
-    const calls = this.stack.viewCallLog(); // Already reverse (LIFO, most recent first)
+    const calls = this.stack.viewCallLog();
 
     if (calls.length === 0) {
       this.recentsListEl.innerHTML = `
@@ -676,26 +752,36 @@ class AppController {
           <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
           </svg>
-          <p style="font-weight: 600; font-size: 14px; color: #fff;">No Recent Calls</p>
-          <p style="font-size: 12px;">Stack is currently empty (top = -1). Dial a number or use PUSH to add calls.</p>
+          <p style="font-weight: 600; font-size: 13.5px; color: #fff;">Call Log is Empty</p>
+          <p style="font-size: 11.5px;">Stack Underflow (s->top = -1). Dial a number or click PUSH to add calls.</p>
         </div>
       `;
       if (this.stackTopBannerEl) {
-        this.stackTopBannerEl.innerHTML = `<span>STACK STATUS</span><span>EMPTY (top = -1)</span>`;
+        this.stackTopBannerEl.innerHTML = `<span>STACK STATUS</span><span>EMPTY (s->top = -1)</span>`;
       }
       return;
     }
 
-    const filtered = calls.filter(c => {
-      if (this.activeFilter === 'all') return true;
-      return c.type.toLowerCase() === this.activeFilter.toLowerCase();
+    let filtered = calls.filter(c => {
+      if (this.activeFilter !== 'all' && c.type.toLowerCase() !== this.activeFilter.toLowerCase()) {
+        return false;
+      }
+      if (this.searchQuery) {
+        const contactName = (this.getContactName(c.number) || '').toLowerCase();
+        const num = c.number.toLowerCase();
+        return contactName.includes(this.searchQuery) || num.includes(this.searchQuery);
+      }
+      return true;
     });
 
     let html = '';
     filtered.forEach((c) => {
       const isTop = c.stackIndex === this.stack.top;
       const typeLower = c.type.toLowerCase();
-      const initials = (this.getContactName(c.number) || c.number).slice(0, 2).toUpperCase();
+      const contact = this.getContactName(c.number);
+      const displayName = contact || c.number;
+      const initials = displayName.slice(0, 2).toUpperCase();
+
       const icon = typeLower === 'incoming' 
         ? `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="7" x2="17" y2="17"></line><polyline points="17 7 17 17 7 17"></polyline></svg>`
         : typeLower === 'outgoing'
@@ -709,7 +795,8 @@ class AppController {
               ${initials}
             </div>
             <div class="call-info">
-              <span class="call-number">${this.getContactName(c.number) || c.number}</span>
+              <span class="call-number">${displayName}</span>
+              ${contact ? `<span style="font-size:9.5px; color:var(--text-dim); font-family:var(--font-mono);">${c.number}</span>` : ''}
               <div class="call-meta">
                 <span class="badge-type ${typeLower}">
                   ${icon} ${c.type}
@@ -732,7 +819,7 @@ class AppController {
     this.recentsListEl.innerHTML = html;
     if (this.stackTopBannerEl) {
       this.stackTopBannerEl.innerHTML = `
-        <span>LIFO CALL STACK</span>
+        <span>LIFO STACK: calls[0..${this.stack.top}]</span>
         <span>TOP INDEX: [${this.stack.top}] (${this.stack.top + 1}/50)</span>
       `;
     }
@@ -744,9 +831,9 @@ class AppController {
     if (this.stack.isEmpty()) {
       this.stackItemsStack.innerHTML = `
         <div class="empty-state" style="padding: 30px;">
-          <p style="font-family: var(--font-mono); font-size: 13px; color: var(--text-dim);">
-            calls[MAX=50] is currently empty.<br>
-            top = -1 (Stack Underflow)
+          <p style="font-family: var(--font-mono); font-size: 12.5px; color: var(--text-dim);">
+            CallStack is empty: s->top = -1<br>
+            Awaiting pushCall() operations
           </p>
         </div>
       `;
@@ -754,20 +841,20 @@ class AppController {
     }
 
     let html = '';
-    // Render from index 0 up to top
     for (let i = 0; i <= this.stack.top; i++) {
       const c = this.stack.calls[i];
       const isTop = i === this.stack.top;
       const memAddr = `0x7ff00` + (100 + i * 8).toString(16);
+      const name = this.getContactName(c.number);
 
       html += `
-        <div class="stack-slot ${isTop ? 'top-item push-animate' : ''}" id="slot-${i}">
+        <div class="stack-slot ${isTop ? 'top-item' : ''}" id="slot-${i}">
           <div class="slot-index">
             ${isTop ? '<span class="pointer-arrow">TOP ➔</span>' : ''}
             <span>[${i}]</span>
           </div>
           <div class="slot-content">
-            <span class="slot-number">${c.number} <small style="color:var(--text-muted)">(${c.type})</small></span>
+            <span class="slot-number">${name ? `${name} (${c.number})` : c.number} <small style="color:var(--text-muted)">• ${c.type}</small></span>
             <span class="slot-details">Duration: ${c.duration}s | Date: ${c.timestamp}</span>
           </div>
           <div class="slot-memory">
@@ -777,7 +864,6 @@ class AppController {
       `;
     }
 
-    // Optional preview of next empty slot if not full
     if (!this.stack.isFull()) {
       const nextIdx = this.stack.top + 1;
       const memAddr = `0x7ff00` + (100 + nextIdx * 8).toString(16);
@@ -806,12 +892,12 @@ class AppController {
     if (this.hudTopPointer) this.hudTopPointer.textContent = this.stack.top;
     if (this.metricTop) this.metricTop.textContent = this.stack.top;
     if (this.metricCount) this.metricCount.textContent = `${count} / ${this.stack.MAX}`;
-    if (this.metricPercent) this.metricPercent.textContent = `${pct}%`;
+    if (this.metricPercent) this.metricPercent.textContent = `${pct}% buffer used`;
     if (this.metricProgressFill) this.metricProgressFill.style.width = `${pct}%`;
 
     if (this.hudStackState) {
       if (this.stack.isEmpty()) {
-        this.hudStackState.textContent = 'EMPTY';
+        this.hudStackState.textContent = 'EMPTY (UNDERFLOW)';
         this.hudStackState.style.color = 'var(--text-dim)';
       } else if (this.stack.isFull()) {
         this.hudStackState.textContent = 'FULL (OVERFLOW)';
@@ -821,6 +907,41 @@ class AppController {
         this.hudStackState.style.color = 'var(--accent-green)';
       }
     }
+  }
+
+  renderAnalytics() {
+    const totalCalls = this.stack.top + 1;
+    let totalSeconds = 0;
+    let missedCount = 0;
+    let outgoingCount = 0;
+    let incomingCount = 0;
+
+    for (let i = 0; i <= this.stack.top; i++) {
+      const c = this.stack.calls[i];
+      totalSeconds += (c.duration || 0);
+      const t = c.type.toLowerCase();
+      if (t === 'missed') missedCount++;
+      else if (t === 'outgoing') outgoingCount++;
+      else if (t === 'incoming') incomingCount++;
+    }
+
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
+    const talkTimeStr = `${mins}m ${secs}s`;
+    const memoryBytes = 50 * 48 + 4; // 50 * sizeof(CallRecord) + sizeof(int)
+
+    const elTotalTalk = document.getElementById('statTotalTalk');
+    const elTotalCalls = document.getElementById('statTotalCalls');
+    const elMissedRatio = document.getElementById('statMissedRatio');
+    const elMemoryFootprint = document.getElementById('statMemoryFootprint');
+
+    if (elTotalTalk) elTotalTalk.textContent = talkTimeStr;
+    if (elTotalCalls) elTotalCalls.textContent = totalCalls;
+    if (elMissedRatio) {
+      const pct = totalCalls > 0 ? Math.round((missedCount / totalCalls) * 100) : 0;
+      elMissedRatio.textContent = `${pct}% (${missedCount} calls)`;
+    }
+    if (elMemoryFootprint) elMemoryFootprint.textContent = `${memoryBytes} bytes (Stack)`;
   }
 
   // --- Terminal Emulator Logic ---
@@ -834,7 +955,6 @@ class AppController {
       }
     });
 
-    // Initial greeting in terminal
     this.logToTerminal(`===================== MOBILE CALL LOG MENU =====================`);
     this.logToTerminal(`1. Add New Call (Push)`);
     this.logToTerminal(`2. Delete Recent Call (Pop)`);
@@ -842,7 +962,7 @@ class AppController {
     this.logToTerminal(`4. View Complete Call Log`);
     this.logToTerminal(`5. Exit`);
     this.logToTerminal(`==================================================================`);
-    this.logToTerminal(`System ready. Enter option (1-5) or click GUI buttons.\n`);
+    this.logToTerminal(`GCC Compiler v9.3.0 CSN102 Runtime initialized.\nType 1-5 or click GUI buttons.\n`);
   }
 
   handleTerminalCommand(cmd) {
@@ -882,18 +1002,8 @@ class AppController {
     this.termBody.scrollTop = this.termBody.scrollHeight;
   }
 
-  // --- Helpers ---
   getContactName(number) {
-    const book = {
-      '9876543210': 'Samaksh Raj',
-      '9123456780': 'DIT Department',
-      '9988776655': 'Krishna Rustagi',
-      '1000024715': 'Krishna (Lead)',
-      '1000025730': 'Samaksh Raj',
-      '1000026934': 'Rimesh Raj',
-      '1000026924': 'Aditya Raj'
-    };
-    return book[number] || null;
+    return this.contactsBook[number] || null;
   }
 
   redialNumber(num) {
@@ -902,12 +1012,12 @@ class AppController {
     this.currentDialNumber = num;
     this.updateDialDisplay();
     this.sound.playDTMF('1');
-    this.showToast(`Number ${num} loaded on keypad!`, 'info');
+    this.showToast(`Loaded ${num} on keypad!`, 'info');
   }
 
   openAddCallModal() {
     if (this.stack.isFull()) {
-      this.showToast('Call log is FULL! Cannot add more calls.', 'danger');
+      this.showToast('Call log is FULL! Cannot add more calls (Stack Overflow).', 'danger');
       return;
     }
     const form = document.getElementById('addCallForm');
@@ -933,23 +1043,23 @@ class AppController {
     setTimeout(() => {
       toast.style.opacity = '0';
       toast.style.transform = 'translateY(10px)';
-      setTimeout(() => toast.remove(), 300);
+      setTimeout(() => toast.remove(), 250);
     }, 3200);
   }
 
-  // Export Data
   exportCSV() {
     const calls = this.stack.viewCallLog();
     if (calls.length === 0) {
       this.showToast('Stack is empty. Nothing to export.', 'danger');
       return;
     }
-    let csv = 'Index,Phone Number,Type,Duration (s),Timestamp\n';
+    let csv = 'Index,Phone Number,Contact,Type,Duration (s),Timestamp\n';
     calls.forEach(c => {
-      csv += `${c.stackIndex},"${c.number}","${c.type}",${c.duration},"${c.timestamp}"\n`;
+      const name = this.getContactName(c.number) || '';
+      csv += `${c.stackIndex},"${c.number}","${name}","${c.type}",${c.duration},"${c.timestamp}"\n`;
     });
     this.downloadFile(csv, 'mobile_call_log_stack.csv', 'text/csv');
-    this.showToast('Exported CSV successfully!', 'success');
+    this.showToast('Exported CSV file!', 'success');
   }
 
   exportJSON() {
@@ -957,18 +1067,22 @@ class AppController {
       project: 'Mobile Call Log Management System',
       university: 'DIT University',
       course: 'CSN102 Data Structure',
+      semester: 'Odd Sem, 2026-2027',
       team: [
-        'Krishna Rustagi (1000024715)',
-        'Samaksh Raj (1000025730)',
-        'Rimesh Raj (1000026934)',
-        'Aditya Raj (1000026924)'
+        { name: 'Krishna Rustagi', sapId: '1000024715', section: 'BTRAI', role: 'Team Lead' },
+        { name: 'Samaksh Raj', sapId: '1000025730', section: 'BTME' },
+        { name: 'Rimesh Raj', sapId: '1000026934', section: 'BTME' },
+        { name: 'Aditya Raj', sapId: '1000026924', section: 'BTME' }
       ],
-      top: this.stack.top,
-      capacity: this.stack.MAX,
+      stackStatus: {
+        top: this.stack.top,
+        capacity: this.stack.MAX,
+        totalCalls: this.stack.top + 1
+      },
       callRecords: this.stack.viewCallLog()
     };
-    this.downloadFile(JSON.stringify(data, null, 2), 'call_log_data.json', 'application/json');
-    this.showToast('Exported JSON report!', 'success');
+    this.downloadFile(JSON.stringify(data, null, 2), 'dit_call_log_report.json', 'application/json');
+    this.showToast('Exported JSON data!', 'success');
   }
 
   downloadFile(content, fileName, mimeType) {
@@ -982,15 +1096,6 @@ class AppController {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   }
-}
-
-// Service worker registration
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(err => {
-      console.log('SW registration error:', err);
-    });
-  });
 }
 
 // Global bootstrap
