@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Mobile Call Log Management System | DIT University</title>
+  <meta name="description" content="Mobile Call Log Management System implementing Stack Data Structure (LIFO) in C and Modern Web GUI. DIT University CSN102 Data Structure Project.">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0ea5e9">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230284c7'><path d='M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z'/></svg>">
+</head>
+<body>
+
+  <!-- Top Academic Navigation Header -->
+  <header class="top-header">
+    <div class="brand-wrapper">
+      <div class="dit-badge">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2L1 21h22L12 2zm0 4.5l6.5 11.5h-13L12 6.5z"/>
+        </svg>
+        <span>DIT UNIVERSITY</span>
+      </div>
+      <div class="title-group">
+        <h1>
+          Mobile Call Log Management System
+          <span style="font-size: 11px; padding: 2px 7px; border-radius: 12px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">Project 8</span>
+        </h1>
+        <p>CSN102 Data Structure • Array-Based Stack (LIFO) • Odd Sem 2026-2027</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn btn-sm btn-success" id="btnToggleAudio" title="Toggle audio feedback">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        </svg>
+        <span>Sound: ON</span>
+      </button>
+
+      <button class="btn btn-sm" id="btnOpSample" title="Load sample calls from assignment report">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23 4 23 10 17 10"></polyline>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+        </svg>
+        <span>Assignment Sample</span>
+      </button>
+
+      <button class="btn btn-sm" id="btnShareProject">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="18" cy="5" r="3"></circle>
+          <circle cx="6" cy="12" r="3"></circle>
+          <circle cx="18" cy="19" r="3"></circle>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+        </svg>
+        <span>Share App</span>
+      </button>
+
+      <button class="btn btn-sm btn-vercel" id="btnVercelDeploy">
+        <svg width="14" height="14" viewBox="0 0 115 100" fill="currentColor">
+          <path d="M57.5 0L115 100H0L57.5 0z" />
+        </svg>
+        <span>Deploy to Vercel</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Team Member & Live Stack State Meta Bar -->
+  <div class="meta-bar">
+    <div class="team-chips">
+      <span class="team-label">Team Members:</span>
+      <span class="member-chip lead">1. Krishna Rustagi (1000024715 • BTRAI)</span>
+      <span class="member-chip">2. Samaksh Raj (1000025730 • BTME)</span>
+      <span class="member-chip">3. Rimesh Raj (1000026934 • BTME)</span>
+      <span class="member-chip">4. Aditya Raj (1000026924 • BTME)</span>
+    </div>
+
+    <div class="stack-live-hud">
+      <div class="hud-stat">
+        <span class="hud-dot" id="hudDot"></span>
+        <span>Stack: <strong id="hudStackState" style="color:var(--accent-green)">ACTIVE</strong></span>
+      </div>
+      <div class="hud-stat">
+        <span>s->top = <strong id="hudTopPointer" style="color:#38bdf8">2</strong></span>
+      </div>
+      <div class="hud-stat">
+        <span>Capacity: <strong>MAX = 50</strong></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Application Grid -->
+  <main class="app-container">
+
+    <!-- LEFT COLUMN: REALISTIC SMARTPHONE SIMULATOR -->
+    <div class="phone-wrapper">
+      <div class="smartphone-frame">
+        <!-- Phone Status Bar -->
+        <div class="phone-status-bar">
+          <span id="phoneTime">09:41</span>
+          <div class="dynamic-island">
+            <div class="camera-dot"></div>
+            <div class="sensor-dot"></div>
+          </div>
+          <div class="status-icons">
+            <span>5G</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+              <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+              <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+              <line x1="12" y1="20" x2="12.01" y2="20"></line>
+            </svg>
+            <svg width="16" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="1" y="6" width="18" height="12" rx="2"></rect>
+              <line x1="23" y1="11" x2="23" y2="13"></line>
+              <rect x="3" y="8" width="13" height="8" rx="1" fill="currentColor"></rect>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Phone Inner Screen -->
+        <div class="phone-screen">
+          <!-- Top Screen Bar with Tab Switcher -->
+          <div class="phone-app-header">
+            <span class="phone-app-title">Phone</span>
+            <div class="phone-view-tabs">
+              <button class="phone-tab-btn active" data-tab="recents">Recents</button>
+              <button class="phone-tab-btn" data-tab="keypad">Keypad</button>
+            </div>
+          </div>
+
+          <!-- TAB 1: RECENTS CALL LOG (STACK LIFO VIEW) -->
+          <div class="phone-tab-content active" id="tab-recents">
+            <!-- Filter Bar -->
+            <div class="recents-filter-bar">
+              <button class="filter-pill active" data-filter="all">All Calls</button>
+              <button class="filter-pill" data-filter="missed">Missed</button>
+              <button class="filter-pill" data-filter="outgoing">Outgoing</button>
+              <button class="filter-pill" data-filter="incoming">Incoming</button>
+            </div>
+
+            <!-- Stack Top Banner -->
+            <div class="stack-top-badge" id="stackTopBanner">
+              <span>LIFO CALL STACK</span>
+              <span>TOP INDEX: [2] (3/50)</span>
+            </div>
+
+            <!-- Scrollable Call List -->
+            <div class="call-list" id="recentsList">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- TAB 2: KEYPAD / DIALER -->
+          <div class="phone-tab-content" id="tab-keypad">
+            <div class="keypad-container">
+              <div class="dial-display">
+                <div class="dial-number" id="dialNumberDisplay"></div>
+                <div class="dial-actions-row">
+                  <button class="btn-backspace" id="btnBackspace" title="Backspace">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path>
+                      <line x1="18" y1="9" x2="12" y2="15"></line>
+                      <line x1="12" y1="9" x2="18" y2="15"></line>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- DTMF Keypad Grid -->
+              <div class="keypad-grid">
+                <button class="key-btn" data-key="1"><span class="key-num">1</span><span class="key-sub">&nbsp;</span></button>
+                <button class="key-btn" data-key="2"><span class="key-num">2</span><span class="key-sub">ABC</span></button>
+                <button class="key-btn" data-key="3"><span class="key-num">3</span><span class="key-sub">DEF</span></button>
+                <button class="key-btn" data-key="4"><span class="key-num">4</span><span class="key-sub">GHI</span></button>
+                <button class="key-btn" data-key="5"><span class="key-num">5</span><span class="key-sub">JKL</span></button>
+                <button class="key-btn" data-key="6"><span class="key-num">6</span><span class="key-sub">MNO</span></button>
+                <button class="key-btn" data-key="7"><span class="key-num">7</span><span class="key-sub">PQRS</span></button>
+                <button class="key-btn" data-key="8"><span class="key-num">8</span><span class="key-sub">TUV</span></button>
+                <button class="key-btn" data-key="9"><span class="key-num">9</span><span class="key-sub">WXYZ</span></button>
+                <button class="key-btn" data-key="*"><span class="key-num">*</span><span class="key-sub">&nbsp;</span></button>
+                <button class="key-btn" data-key="0"><span class="key-num">0</span><span class="key-sub">+</span></button>
+                <button class="key-btn" data-key="#"><span class="key-num">#</span><span class="key-sub">&nbsp;</span></button>
+              </div>
+
+              <!-- Call Action Row -->
+              <div class="call-action-row">
+                <button class="btn-call-trigger" id="btnCallTrigger" title="Place Call">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 0 0-1.01.24l-1.57 1.97c-2.83-1.35-5.43-3.9-6.63-6.82l1.97-1.61c.3-.26.39-.65.25-1.02A11.36 11.36 0 0 1 8.92 4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.62c0-.55-.45-1-.99-1z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ACTIVE CALL OVERLAY -->
+          <div class="active-call-overlay" id="activeCallOverlay">
+            <div class="call-header-info">
+              <div class="caller-avatar-lg">📞</div>
+              <div class="caller-name-lg" id="activeCallerName">9876543210</div>
+              <div class="call-status-indicator">
+                <span class="hud-dot" style="width:6px; height:6px;"></span>
+                <span>Call in progress</span>
+              </div>
+              <div class="call-duration-timer" id="activeCallTimer">00:00</div>
+            </div>
+
+            <div class="call-tools-grid">
+              <button class="call-tool-btn">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+              </button>
+              <button class="call-tool-btn">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+              </button>
+              <button class="call-tool-btn">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+              </button>
+            </div>
+
+            <button class="btn-end-call" id="btnEndCall" title="End Call & Push to Stack">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08a.996.996 0 0 1 0-1.41C3.26 8.7 7.39 7 12 7c4.61 0 8.74 1.7 11.71 4.67.39.39.39 1.02 0 1.41l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- INCOMING CALL MODAL BANNER -->
+          <div class="incoming-call-modal" id="incomingCallModal">
+            <div class="incoming-content">
+              <div>
+                <div style="font-size: 11px; color: #38bdf8; font-weight: 700;">INCOMING CALL</div>
+                <div style="font-size: 14px; font-weight: 700; color: #fff;" id="incomingCallerName">Samaksh Raj</div>
+              </div>
+              <div class="incoming-actions">
+                <button class="btn-accept-mini" id="btnAcceptIncoming" title="Answer">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 0 0-1.01.24l-1.57 1.97c-2.83-1.35-5.43-3.9-6.63-6.82l1.97-1.61c.3-.26.39-.65.25-1.02A11.36 11.36 0 0 1 8.92 4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.62c0-.55-.45-1-.99-1z"/></svg>
+                </button>
+                <button class="btn-decline-mini" id="btnDeclineIncoming" title="Decline (Logs Missed Call)">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Simulator Buttons -->
+      <div class="phone-triggers-bar">
+        <button class="btn btn-sm" id="btnSimulateIncoming">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+          <span>Simulate Incoming Ring</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: DATA STRUCTURE ENGINE & CONTROL HUB -->
+    <div class="engine-workspace">
+
+      <!-- STACK OPERATIONS CONTROL HUB -->
+      <div class="panel-card glass">
+        <div class="panel-header">
+          <div class="panel-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+              <polyline points="2 17 12 22 22 17"></polyline>
+              <polyline points="2 12 12 17 22 12"></polyline>
+            </svg>
+            <span>Stack Operations Hub (C Module Mappings)</span>
+          </div>
+          <div class="panel-actions">
+            <button class="btn btn-sm btn-danger" id="btnOpReset" title="Reset Stack (s->top = -1)">
+              <span>Clear Stack</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="stack-ops-grid">
+          <!-- 1. PUSH -->
+          <div class="op-btn push" id="btnOpPush">
+            <div class="op-title">
+              <span style="color:var(--accent-green)">●</span>
+              <span>1. PUSH (Add)</span>
+            </div>
+            <span class="op-c-fn">pushCall(&s, c)</span>
+            <span class="op-badge">Time: O(1)</span>
+          </div>
+
+          <!-- 2. POP -->
+          <div class="op-btn pop" id="btnOpPop">
+            <div class="op-title">
+              <span style="color:var(--accent-red)">●</span>
+              <span>2. POP (Delete)</span>
+            </div>
+            <span class="op-c-fn">popCall(&s, &del)</span>
+            <span class="op-badge">Time: O(1)</span>
+          </div>
+
+          <!-- 3. PEEK -->
+          <div class="op-btn peek" id="btnOpPeek">
+            <div class="op-title">
+              <span style="color:var(--primary-light)">●</span>
+              <span>3. PEEK (View Top)</span>
+            </div>
+            <span class="op-c-fn">peekCall(&s, &top)</span>
+            <span class="op-badge">Time: O(1)</span>
+          </div>
+
+          <!-- 4. TRAVERSE -->
+          <div class="op-btn traverse" id="btnOpTraverse">
+            <div class="op-title">
+              <span style="color:var(--accent-purple)">●</span>
+              <span>4. TRAVERSE</span>
+            </div>
+            <span class="op-c-fn">viewCallLog(&s)</span>
+            <span class="op-badge">Time: O(n)</span>
+          </div>
+        </div>
+
+        <!-- STACK MEMORY ARCHITECTURE & TELEMETRY -->
+        <div class="stack-viz-container">
+          <!-- Left: Physical Array Stack Layout -->
+          <div class="stack-memory-column">
+            <div class="stack-header-hud">
+              <span>ARRAY: CallRecord calls[MAX=50]</span>
+              <span>LIFO ORDER (Top = Newest)</span>
+            </div>
+
+            <!-- Vertical Stack Container (calls[0] bottom, calls[top] at top) -->
+            <div class="stack-items-stack" id="stackItemsStack">
+              <!-- Dynamically populated via JS -->
+            </div>
+          </div>
+
+          <!-- Right: Telemetry & Complexity Card -->
+          <div class="stack-telemetry-col">
+            <div class="telemetry-card">
+              <h4>Stack Memory Top</h4>
+              <div class="metric-number" id="metricTop">2</div>
+              <div class="metric-sub">Index of top element (s->top)</div>
+            </div>
+
+            <div class="telemetry-card">
+              <h4>Capacity Utilization</h4>
+              <div class="metric-number" id="metricCount">3 / 50</div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="metricProgressFill" style="width: 6%;"></div>
+              </div>
+              <div class="metric-sub" id="metricPercent">6% used (bounded array)</div>
+            </div>
+
+            <div class="telemetry-card">
+              <h4>Asymptotic Complexity</h4>
+              <table class="complexity-table">
+                <tr><td>pushCall()</td><td>O(1)</td></tr>
+                <tr><td>popCall()</td><td>O(1)</td></tr>
+                <tr><td>peekCall()</td><td>O(1)</td></tr>
+                <tr><td>viewCallLog()</td><td>O(n)</td></tr>
+                <tr><td>Space Complexity</td><td>O(MAX)</td></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM TABS: GCC TERMINAL / SOURCE CODE / DOSSIER -->
+      <div class="panel-card glass">
+        <div class="tabs-nav">
+          <button class="tab-btn active" data-view="view-terminal">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+            <span>GCC Terminal Emulator</span>
+          </button>
+          <button class="tab-btn" data-view="view-code">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+            <span>C Source Code (calllog.c)</span>
+          </button>
+          <button class="tab-btn" data-view="view-dossier">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            <span>Project Dossier & Report</span>
+          </button>
+        </div>
+
+        <!-- 1. GCC TERMINAL EMULATOR -->
+        <div class="tab-content-view" id="view-terminal">
+          <div class="terminal-view">
+            <div class="terminal-header">
+              <div class="term-dots">
+                <span class="term-dot red"></span>
+                <span class="term-dot yellow"></span>
+                <span class="term-dot green"></span>
+              </div>
+              <span class="term-title">gcc calllog.c -o calllog -Wall && ./calllog</span>
+              <div style="font-size: 10px; color: var(--text-dim);">DIT CSN102 Runtime</div>
+            </div>
+            <div class="terminal-body" id="termBody">
+              <!-- Logs logged dynamically -->
+            </div>
+            <div class="terminal-input-row">
+              <span class="term-prompt">Enter your choice:</span>
+              <input type="text" class="term-input" id="termInput" placeholder="Type 1, 2, 3, 4, 5 and press Enter..." autocomplete="off">
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. C SOURCE CODE (calllog.c) -->
+        <div class="tab-content-view" id="view-code" style="display: none;">
+          <pre class="code-viewer-pre"><code>/* =========================================================
+ Mobile Call Log Management System
+ Data Structure Used : STACK (Array-based implementation)
+ Authors             : Krishna Rustagi, Samaksh Raj, Rimesh Raj, Aditya Raj
+ Course              : DIT University - CSN102 Data Structure
+ Operations Supported :
+   1. Add New Call Record (PUSH)
+   2. Delete Recent Call (POP)
+   3. View Last Dialed / Recent Call (PEEK / TOP)
+   4. View Complete Call Log (TRAVERSAL - top to bottom)
+   5. Check if Call Log is Empty (ISEMPTY)
+   6. Exit
+ ========================================================= */
+
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdlib.h&gt;
+
+#define MAX 50 /* Maximum number of call records the stack can hold */
+
+/* ---------- Structure to store a single call record ---------- */
+typedef struct {
+    char number[15];    /* phone number */
+    char type[10];      /* Incoming / Outgoing / Missed */
+    int duration;       /* duration in seconds */
+    char timestamp[20]; /* date-time of call, given as string */
+} CallRecord;
+
+/* ---------- Stack structure ---------- */
+typedef struct {
+    CallRecord calls[MAX];
+    int top; /* index of the top element, -1 means empty */
+} CallStack;
+
+/* ---------- Function prototypes ---------- */
+void initStack(CallStack *s);
+int isFull(CallStack *s);
+int isEmpty(CallStack *s);
+void pushCall(CallStack *s, CallRecord c);
+int popCall(CallStack *s, CallRecord *deleted);
+int peekCall(CallStack *s, CallRecord *top);
+void viewCallLog(CallStack *s);
+void addNewCall(CallStack *s);
+void menu(void);
+
+/* ---------- Initialize the stack ---------- */
+void initStack(CallStack *s) {
+    s-&gt;top = -1;
+}
+
+/* ---------- Check if stack is full ---------- */
+int isFull(CallStack *s) {
+    return s-&gt;top == MAX - 1;
+}
+
+/* ---------- Check if stack is empty ---------- */
+int isEmpty(CallStack *s) {
+    return s-&gt;top == -1;
+}
+
+/* ---------- PUSH: Add a new call record on top of stack ---------- */
+void pushCall(CallStack *s, CallRecord c) {
+    if (isFull(s)) {
+        printf("\nCall log is FULL! Cannot add more calls.\n");
+        return;
+    }
+    s-&gt;top++;
+    s-&gt;calls[s-&gt;top] = c;
+    printf("\nCall record added successfully.\n");
+}
+
+/* ---------- POP: Delete the most recent call from the stack ---------- */
+int popCall(CallStack *s, CallRecord *deleted) {
+    if (isEmpty(s)) {
+        return 0; /* failure - nothing to delete */
+    }
+    *deleted = s-&gt;calls[s-&gt;top];
+    s-&gt;top--;
+    return 1; /* success */
+}
+
+/* ---------- PEEK: View last dialed / most recent call without removing it ---------- */
+int peekCall(CallStack *s, CallRecord *topCall) {
+    if (isEmpty(s)) {
+        return 0;
+    }
+    *topCall = s-&gt;calls[s-&gt;top];
+    return 1;
+}
+
+/* ---------- Display the entire call log (most recent first) ---------- */
+void viewCallLog(CallStack *s) {
+    if (isEmpty(s)) {
+        printf("\nCall log is empty. No calls to display.\n");
+        return;
+    }
+    printf("\n--------------------------------------------------------------\n");
+    printf("%-15s %-10s %-10s %-15s\n", "Number", "Type", "Duration", "Timestamp");
+    printf("--------------------------------------------------------------\n");
+    for (int i = s-&gt;top; i &gt;= 0; i--) {
+        printf("%-15s %-10s %-10d %-15s\n",
+               s-&gt;calls[i].number, s-&gt;calls[i].type,
+               s-&gt;calls[i].duration, s-&gt;calls[i].timestamp);
+    }
+    printf("--------------------------------------------------------------\n");
+    printf("Total calls in log: %d\n", s-&gt;top + 1);
+}</code></pre>
+        </div>
+
+        <!-- 3. PROJECT REPORT DOSSIER -->
+        <div class="tab-content-view" id="view-dossier" style="display: none;">
+          <div style="font-size: 13.5px; line-height: 1.7; color: #cbd5e1;">
+            <h3 style="color:#fff; margin-bottom: 8px;">DIT University Project Dossier</h3>
+            <p><strong>Course:</strong> CSN102 Data Structure, Odd Sem, 2026-2027</p>
+            <p><strong>Project Chosen:</strong> Project 8 – Mobile Call Log Management System</p>
+            <p><strong>Students:</strong> Krishna Rustagi (1000024715), Samaksh Raj (1000025730), Rimesh Raj (1000026934), Aditya Raj (1000026924)</p>
+            
+            <h4 style="color:#38bdf8; margin: 14px 0 6px;">Why Stack (LIFO) is the Ideal Data Structure:</h4>
+            <p>In modern smartphones, user interaction with call records inherently favors recency:
+              checking the last dialed number or clearing the most recent accidental dial. 
+              By mapping operations to a Stack:
+            </p>
+            <ul style="padding-left: 20px; margin-top: 6px;">
+              <li><strong>Add Call (PUSH):</strong> Places new record onto the top index in <code>O(1)</code> time.</li>
+              <li><strong>Delete Most Recent Call (POP):</strong> Removes only the topmost entry in <code>O(1)</code> time without moving other elements.</li>
+              <li><strong>View Last Dialed/Received Call (PEEK):</strong> Inspects <code>calls[s->top]</code> in <code>O(1)</code> time.</li>
+              <li><strong>View Complete Call Log:</strong> Traverses top-to-bottom in <code>O(n)</code> time.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- MODAL: ADD CALL (MANUAL PUSH) -->
+  <div class="modal-backdrop" id="addCallModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          <span>Push New Call Record (s->top++)</span>
+        </h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <form id="addCallForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Phone Number (char number[15])</label>
+            <input type="text" class="form-input" id="inputNumber" placeholder="e.g. 9876543210" required maxlength="14">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Call Type (char type[10])</label>
+            <select class="form-select" id="inputType">
+              <option value="Incoming">Incoming (↙️)</option>
+              <option value="Outgoing">Outgoing (↗️)</option>
+              <option value="Missed">Missed (📵)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Duration in seconds (int duration)</label>
+            <input type="number" class="form-input" id="inputDuration" placeholder="e.g. 120" min="0" value="45">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Timestamp (char timestamp[20])</label>
+            <input type="text" class="form-input" id="inputTimestamp" placeholder="DD-MM-YYYY">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-modal-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary">Push to Stack</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: VERCEL DEPLOYMENT & SHARING GUIDE -->
+  <div class="modal-backdrop" id="vercelModal">
+    <div class="modal-box" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3>
+          <svg width="18" height="18" viewBox="0 0 115 100" fill="currentColor"><path d="M57.5 0L115 100H0L57.5 0z"/></svg>
+          <span>Deploy to Vercel (Instant Live Sharing)</span>
+        </h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: var(--text-muted);">
+          This project is 100% pre-configured with <code>vercel.json</code>, PWA offline manifest, and zero-build static hosting.
+        </p>
+        
+        <div style="background: #05070c; padding: 12px; border-radius: var(--radius-sm); border: 1px solid #1e293b;">
+          <div style="font-size: 11px; color: #38bdf8; font-weight: 700; margin-bottom: 6px;">METHOD 1: Instant Vercel CLI (1-Command)</div>
+          <code style="font-family: var(--font-mono); font-size: 12px; color: #34d399;">
+            vercel --prod
+          </code>
+          <p style="font-size: 11px; color: var(--text-dim); margin-top: 6px;">
+            Run this command directly in the project directory in your terminal!
+          </p>
+        </div>
+
+        <div style="background: #05070c; padding: 12px; border-radius: var(--radius-sm); border: 1px solid #1e293b;">
+          <div style="font-size: 11px; color: #38bdf8; font-weight: 700; margin-bottom: 6px;">METHOD 2: GitHub + Vercel Integration</div>
+          <ol style="font-size: 12px; padding-left: 18px; color: #cbd5e1; line-height: 1.6;">
+            <li>Push this folder to a GitHub repository.</li>
+            <li>Visit <strong>vercel.com/new</strong> and import the repository.</li>
+            <li>Click <strong>Deploy</strong> — Vercel gives you an instant <code>https://your-app.vercel.app</code> URL!</li>
+          </ol>
+        </div>
+
+        <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.2); padding: 10px; border-radius: var(--radius-sm); font-size: 12px; color: #38bdf8;">
+          💡 <strong>Daily Use Tip:</strong> On your smartphone (iPhone or Android), open your live Vercel URL and tap <strong>"Add to Home Screen"</strong>. It installs as a full standalone app!
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-modal-cancel">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: SHARE PROJECT -->
+  <div class="modal-backdrop" id="shareModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+          <span>Share Project & Export Data</span>
+        </h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: var(--text-muted);">
+          Share this web application with teachers, evaluators, and teammates, or download your call log data:
+        </p>
+
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-primary" id="btnCopyShareLink" style="flex:1;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <span>Copy App Link</span>
+          </button>
+        </div>
+
+        <div style="border-top: 1px solid var(--border-subtle); padding-top: 12px; display: flex; gap: 10px;">
+          <button class="btn" id="btnExportCSV" style="flex:1;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <span>Export CSV</span>
+          </button>
+          <button class="btn" id="btnExportJSON" style="flex:1;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+            <span>Export JSON</span>
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-modal-cancel">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <p>DIT University • CSN102 Data Structure Project • Developed by Krishna Rustagi, Samaksh Raj, Rimesh Raj, Aditya Raj</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
